@@ -2,7 +2,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ProductRepo {
-    List<Product> repo = new ArrayList<>();
+    List<Product> repo;
+
+    public ProductRepo() {
+        repo = new ArrayList<>();
+    }
 
     public void addProduct(Product p) {
         repo.add(p);
