@@ -1,2 +1,2 @@
-public record Order(int orderNumber) {
+public record Order(int orderNumber, Product product) {
 }

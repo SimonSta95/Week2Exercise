@@ -1,38 +1,44 @@
-import java.util.ArrayList;
 import java.util.List;
 
 public class ShopService {
 
-    ProductRepo productList = new ProductRepo();
+    ProductRepo productRepo = new ProductRepo();
+    OrderListRepo orderRepo = new OrderListRepo();
 
-    List<Product> order = new ArrayList<>();
+    public Order createOrder(int orderNumber, Product product){
 
-    public void placeOrderByName(String productName) {
-        Product product = productList.getProductByName(productName);
-        if(checkAvailability(product)) {
-
-            order.add(product);
-        }
-    }
-
-    public void placeOrderByNumber(String productNumber) {
-        Product product = productList.getProductByNumber(productNumber);
-        if(checkAvailability(product)) {
-            order.add(product);
+        if(checkAvailabiltiy(product)){
+            Order newOrder = new Order(orderNumber, product);
+            if(checkDuplicateOrder(newOrder)) {
+                orderRepo.addOrder(newOrder);
+                return newOrder;
+            }
         }
 
+        System.out.println("Order was not created.");
+        return null;
     }
 
-    public boolean checkAvailability(Product product) {
-        List<Product> products = productList.getProducts();
+    public boolean checkDuplicateOrder(Order order){
+        List<Order> orders = orderRepo.getAllOrders();
+        for(Order o : orders){
+            if(o.equals(order)){
+                System.out.println("Order already exists.");
+                return false;
+            }
+        }
+        return true;
+    }
 
-        for (Product p : products) {
-            if(p == product) {
+    public boolean checkAvailabiltiy(Product product){
+        List<Product> products = productRepo.getProducts();
+        for(Product p : products){
+            if(p == product){
                 return true;
             }
         }
-        System.out.println("Product not available.");
+
+        System.out.println("Product is not available.");
         return false;
     }
-
 }
