@@ -12,7 +12,16 @@ public class ProductRepo {
         repo.remove(p);
     }
 
-    public Product getProduct(String productNumber) {
+    public Product getProductByName(String productName) {
+        for (Product p : repo) {
+            if (p.name() == productName) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public Product getProductByNumber(String productNumber) {
         for (Product p : repo) {
             if (p.productNumber() == productNumber) {
                 return p;
