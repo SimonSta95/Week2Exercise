@@ -1,10 +1,13 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class OrderMapRepo implements OrderRepo{
-
     Map<String, Order> orderRepo;
+    public OrderMapRepo() {
+        orderRepo = new HashMap<String, Order>();
+    }
 
     public List<Order> getAllOrders(){
         return new ArrayList<>(orderRepo.values());

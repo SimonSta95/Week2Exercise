@@ -11,7 +11,7 @@ public class OrderTest {
 
         // Create an order
         int orderNumber = 123;
-        Order order = new Order(orderNumber, product);
+        Order order = new Order(String.valueOf(orderNumber), product);
 
         // Verify orderNumber and product are correctly set
         assertEquals(orderNumber, order.orderNumber());
@@ -28,9 +28,9 @@ public class OrderTest {
         int orderNumber1 = 123;
         int orderNumber2 = 456;
 
-        Order order1 = new Order(orderNumber1, product1);
-        Order order2 = new Order(orderNumber1, product1);
-        Order order3 = new Order(orderNumber2, product1);
+        Order order1 = new Order(String.valueOf(orderNumber1), product1);
+        Order order2 = new Order(String.valueOf(orderNumber1), product1);
+        Order order3 = new Order(String.valueOf(orderNumber2), product1);
 
         // Verify equality
         assertEquals(order1, order2, "Orders with the same order number and product should be equal");
@@ -46,9 +46,9 @@ public class OrderTest {
         // Create orders with the same order number and product
         int orderNumber = 123;
 
-        Order order1 = new Order(orderNumber, product1);
-        Order order2 = new Order(orderNumber, product1);
-        Order order3 = new Order(orderNumber, product2);
+        Order order1 = new Order(String.valueOf(orderNumber), product1);
+        Order order2 = new Order(String.valueOf(orderNumber), product1);
+        Order order3 = new Order(String.valueOf(orderNumber), product2);
 
         // Verify hashCode
         assertEquals(order1.hashCode(), order2.hashCode(), "Orders with the same order number and product should have the same hash code");
@@ -62,7 +62,7 @@ public class OrderTest {
 
         // Create an order
         int orderNumber = 123;
-        Order order = new Order(orderNumber, product);
+        Order order = new Order(String.valueOf(orderNumber), product);
 
         // Verify toString representation
         assertEquals("Order[orderNumber=123, product=Product[price=100.0, name=Product1, productNumber=P001, quantity=10]]", order.toString(), "toString method should return the correct representation");

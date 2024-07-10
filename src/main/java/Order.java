@@ -1,3 +1,3 @@
-public record Order(int orderNumber,
+public record Order(String orderNumber,
                     Product product) {
 }

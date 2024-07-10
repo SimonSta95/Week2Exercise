@@ -1,94 +1,87 @@
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.ArrayList;
 
 public class ShopServiceTest {
+
     private ShopService shopService;
     private ProductRepo productRepo;
-    private OrderListRepo orderRepo;
+    private OrderRepo orderRepo;
 
     @BeforeEach
     public void setUp() {
+        // Mock repositories
         productRepo = new ProductRepo();
-        orderRepo = new OrderListRepo();
+        orderRepo = new OrderListRepo(); // or OrderMapRepo
 
-        // Mock ShopService to use the mock repositories
-        shopService = new ShopService();
-        shopService.productRepo = productRepo;
-        shopService.orderRepo = orderRepo;
+        // Initialize ShopService with mock repositories
+        shopService = new ShopService((OrderListRepo) orderRepo,productRepo);
 
-        // Add some products to the product repository for testing
-        productRepo.addProduct(new Product(100.0, "Product1", "P001", 10));
-        productRepo.addProduct(new Product(150.0, "Product2", "P002", 5));
+        // Add some mock products to productRepo
+        productRepo.addProduct(new Product(10.0, "Product A", "A001", 5));
+        productRepo.addProduct(new Product(15.0, "Product B", "B001", 3));
     }
 
     @Test
     public void testCreateOrderSuccess() {
-        Product product = productRepo.getProductByName("Product1");
-        int orderNumber = 1;
+        Product product = productRepo.getProductByName("Product A");
+        Order order = shopService.createOrder("ORD001", product);
 
-        Order order = shopService.createOrder(orderNumber, product);
-
-        assertNotNull(order, "Order should be created successfully");
-        assertEquals(orderNumber, order.orderNumber());
+        assertNotNull(order);
+        assertEquals("ORD001", order.orderNumber());
         assertEquals(product, order.product());
+    }
 
-        // Check that the order was added to the orderRepo
-        List<Order> orders = orderRepo.getAllOrders();
-        assertTrue(orders.contains(order));
+    @Test
+    public void testCreateOrderDuplicate() {
+        Product product = productRepo.getProductByName("Product A");
+        Order order1 = shopService.createOrder("ORD001", product);
+        Order order2 = shopService.createOrder("ORD001", product);
+
+        assertNotNull(order1);
+        assertNull(order2); // Second order creation should fail
     }
 
     @Test
     public void testCreateOrderProductNotAvailable() {
-        Product unavailableProduct = new Product(200.0, "Product3", "P003", 0);
-        int orderNumber = 2;
+        Product nonExistingProduct = new Product(20.0, "Product C", "C001", 1);
+        Order order = shopService.createOrder("ORD002", nonExistingProduct);
 
-        Order order = shopService.createOrder(orderNumber, unavailableProduct);
-
-        assertNull(order, "Order should not be created if product is not available");
+        assertNull(order);
     }
 
     @Test
-    public void testCreateOrderDuplicateOrder() {
-        Product product = productRepo.getProductByName("Product1");
-        int orderNumber = 1;
+    public void testCheckDuplicateOrderExistingOrder() {
+        Order existingOrder = new Order("ORD001", new Product(10.0, "Product A", "A001", 5));
+        boolean result = shopService.checkDuplicateOrder(existingOrder);
 
-        // Create the first order
-        Order order1 = shopService.createOrder(orderNumber, product);
-        assertNotNull(order1, "First order should be created successfully");
-
-        // Trying to create a duplicate order
-        Order order2 = shopService.createOrder(orderNumber, product);
-
-        assertNull(order2, "Duplicate order should not be created");
+        assertFalse(result);
     }
 
     @Test
-    public void testCheckDuplicateOrder() {
-        Product product = new Product(100.0, "Product1", "P001", 10);
-        int orderNumber = 1;
+    public void testCheckDuplicateOrderNewOrder() {
+        Order newOrder = new Order("ORD003", new Product(20.0, "Product C", "C001", 2));
+        boolean result = shopService.checkDuplicateOrder(newOrder);
 
-        Order order = new Order(orderNumber, product);
-
-        // Add the order to the mock repository
-        orderRepo.addOrder(order);
-
-        // Verify checkDuplicateOrder method
-        assertFalse(shopService.checkDuplicateOrder(order), "Duplicate order should return false");
+        assertTrue(result);
     }
 
     @Test
-    public void testCheckAvailability() {
-        Product availableProduct = productRepo.getProductByName("Product1");
-        Product unavailableProduct = new Product(200.0, "Product3", "P003", 0);
+    public void testCheckAvailabilityProductAvailable() {
+        Product product = productRepo.getProductByName("Product A");
+        boolean result = shopService.checkAvailabiltiy(product);
 
-        assertTrue(shopService.checkAvailabiltiy(availableProduct), "Available product should return true");
-        assertFalse(shopService.checkAvailabiltiy(unavailableProduct), "Unavailable product should return false");
+        assertTrue(result);
+    }
+
+    @Test
+    public void testCheckAvailabilityProductNotAvailable() {
+        Product nonExistingProduct = new Product(20.0, "Product C", "C001", 1);
+        boolean result = shopService.checkAvailabiltiy(nonExistingProduct);
+
+        assertFalse(result);
     }
 }

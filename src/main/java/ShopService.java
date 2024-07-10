@@ -2,14 +2,25 @@ import java.util.List;
 
 public class ShopService {
 
-    ProductRepo productRepo = new ProductRepo();
-    OrderListRepo orderRepo = new OrderListRepo();
+    private ProductRepo productRepo;
+    private OrderRepo orderRepo;
 
-    public Order createOrder(int orderNumber, Product product){
+    public ShopService(OrderListRepo listRepo, ProductRepo productRepo) {
+        this.productRepo = productRepo;
+        this.orderRepo = listRepo;
+    }
+
+    public ShopService(OrderMapRepo mapRepo, ProductRepo productRepo) {
+        this.productRepo = productRepo;
+        this.orderRepo = mapRepo;
+    }
+
+    public Order createOrder(String orderNumber, Product product){
 
         if(checkAvailabiltiy(product)){
             Order newOrder = new Order(orderNumber, product);
             if(checkDuplicateOrder(newOrder)) {
+
                 orderRepo.addOrder(newOrder);
                 return newOrder;
             }

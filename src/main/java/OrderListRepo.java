@@ -1,7 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class OrderListRepo {
+public class OrderListRepo implements OrderRepo {
     List<Order> orderRepo;
 
     public OrderListRepo() {
@@ -14,7 +15,7 @@ public class OrderListRepo {
 
     public Order getOrderById(int id) {
         for (Order order : orderRepo) {
-            if(order.orderNumber() == id){
+            if(Objects.equals(order.orderNumber(), String.valueOf(id))){
                 return order;
             }
         }

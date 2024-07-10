@@ -27,8 +27,8 @@ public class OrderMapRepoTest {
     @Test
     public void testGetAllOrders() {
         List<Order> expectedOrders = List.of(
-                new Order(1, new Product(100.0, "Product1", "P001", 10)),
-                new Order(2, new Product(150.0, "Product2", "P002", 5))
+                new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10)),
+                new Order(String.valueOf(2), new Product(150.0, "Product2", "P002", 5))
         );
 
         when(mockOrderRepo.values()).thenReturn(new ArrayList<>(expectedOrders));
@@ -41,19 +41,19 @@ public class OrderMapRepoTest {
 
     @Test
     public void testGetOrderById() {
-        Order expectedOrder = new Order(1, new Product(100.0, "Product1", "P001", 10));
+        Order expectedOrder = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
         String orderId = String.valueOf(expectedOrder.orderNumber());
 
         when(mockOrderRepo.get(orderId)).thenReturn(expectedOrder);
 
-        Order actualOrder = orderMapRepo.getOrderById(expectedOrder.orderNumber());
+        Order actualOrder = orderMapRepo.getOrderById(Integer.parseInt(expectedOrder.orderNumber()));
 
         assertEquals(expectedOrder, actualOrder);
     }
 
     @Test
     public void testAddOrder() {
-        Order orderToAdd = new Order(1, new Product(100.0, "Product1", "P001", 10));
+        Order orderToAdd = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
 
         orderMapRepo.addOrder(orderToAdd);
 
@@ -62,7 +62,7 @@ public class OrderMapRepoTest {
 
     @Test
     public void testRemoveOrder() {
-        Order orderToRemove = new Order(1, new Product(100.0, "Product1", "P001", 10));
+        Order orderToRemove = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
 
         when(mockOrderRepo.remove(String.valueOf(orderToRemove.orderNumber()))).thenReturn(orderToRemove);
 
