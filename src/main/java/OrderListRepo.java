@@ -13,9 +13,9 @@ public class OrderListRepo implements OrderRepo {
         return orderRepo;
     }
 
-    public Order getOrderById(int id) {
+    public Order getOrderByNumber(String number) {
         for (Order order : orderRepo) {
-            if(Objects.equals(order.orderNumber(), String.valueOf(id))){
+            if(Objects.equals(order.orderNumber(), number)){
                 return order;
             }
         }

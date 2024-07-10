@@ -1,90 +1,91 @@
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import org.mockito.Mockito;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ShopServiceTest {
 
-    private ShopService shopService;
     private ProductRepo productRepo;
     private OrderRepo orderRepo;
+    private ShopService shopService;
+
+    private Product product;
+    private Order order;
 
     @BeforeEach
     public void setUp() {
-        // Mock repositories
-        productRepo = new ProductRepo();
-        orderRepo = new OrderListRepo(); // or OrderMapRepo
+        productRepo = Mockito.mock(ProductRepo.class);
+        orderRepo = Mockito.mock(OrderRepo.class);
 
-        // Initialize ShopService with mock repositories
-        shopService = new ShopService((OrderListRepo) orderRepo,productRepo);
+        product = new Product(19.99, "Test Product", "12345");
+        order = new Order("ORD123", product, 2, 39.98);
 
-        // Add some mock products to productRepo
-        productRepo.addProduct(new Product(10.0, "Product A", "A001", 5));
-        productRepo.addProduct(new Product(15.0, "Product B", "B001", 3));
+        List<Product> products = new ArrayList<>();
+        products.add(product);
+
+        Mockito.when(productRepo.getProducts()).thenReturn(products);
+
+        shopService = new ShopService(orderRepo, productRepo);
     }
 
     @Test
-    public void testCreateOrderSuccess() {
-        Product product = productRepo.getProductByName("Product A");
-        Order order = shopService.createOrder("ORD001", product);
+    public void testCreateOrder() {
+        Mockito.when(orderRepo.getAllOrders()).thenReturn(new ArrayList<>());
 
-        assertNotNull(order);
-        assertEquals("ORD001", order.orderNumber());
-        assertEquals(product, order.product());
+        shopService.createOrder("ORD123", product, 2);
+
+        Mockito.verify(orderRepo, Mockito.times(1)).addOrder(Mockito.any(Order.class));
     }
 
     @Test
-    public void testCreateOrderDuplicate() {
-        Product product = productRepo.getProductByName("Product A");
-        Order order1 = shopService.createOrder("ORD001", product);
-        Order order2 = shopService.createOrder("ORD001", product);
+    public void testCreateOrderWhenProductNotAvailable() {
+        List<Product> emptyProductList = new ArrayList<>();
+        Mockito.when(productRepo.getProducts()).thenReturn(emptyProductList);
 
-        assertNotNull(order1);
-        assertNull(order2); // Second order creation should fail
+        shopService.createOrder("ORD123", product, 2);
+
+        Mockito.verify(orderRepo, Mockito.never()).addOrder(Mockito.any(Order.class));
     }
 
     @Test
-    public void testCreateOrderProductNotAvailable() {
-        Product nonExistingProduct = new Product(20.0, "Product C", "C001", 1);
-        Order order = shopService.createOrder("ORD002", nonExistingProduct);
+    public void testCreateOrderWhenOrderIsDuplicate() {
+        List<Order> orders = new ArrayList<>();
+        orders.add(order);
+        Mockito.when(orderRepo.getAllOrders()).thenReturn(orders);
 
-        assertNull(order);
+        shopService.createOrder("ORD123", product, 2);
+
+        Mockito.verify(orderRepo, Mockito.never()).addOrder(Mockito.any(Order.class));
     }
 
     @Test
-    public void testCheckDuplicateOrderExistingOrder() {
+    public void testCheckDuplicateOrder() {
+        List<Order> orders = new ArrayList<>();
+        orders.add(order);
+        Mockito.when(orderRepo.getAllOrders()).thenReturn(orders);
 
-        orderRepo.addOrder(new Order("ORD001", new Product(10.0, "Product A", "A001", 5)));
+        boolean isDuplicate = shopService.checkDuplicateOrder(order);
 
-        Order existingOrder = new Order("ORD001", new Product(10.0, "Product A", "A001", 5));
-        boolean result = shopService.checkDuplicateOrder(existingOrder);
-
-        assertFalse(result);
+        assertThat(isDuplicate).isFalse();
     }
 
     @Test
-    public void testCheckDuplicateOrderNewOrder() {
-        Order newOrder = new Order("ORD003", new Product(20.0, "Product C", "C001", 2));
-        boolean result = shopService.checkDuplicateOrder(newOrder);
+    public void testCheckAvailabiltiy() {
+        boolean isAvailable = shopService.checkAvailabiltiy(product);
 
-        assertTrue(result);
+        assertThat(isAvailable).isTrue();
     }
 
     @Test
-    public void testCheckAvailabilityProductAvailable() {
-        Product product = productRepo.getProductByName("Product A");
-        boolean result = shopService.checkAvailabiltiy(product);
+    public void testCheckAvailabiltiyWhenProductNotAvailable() {
+        List<Product> emptyProductList = new ArrayList<>();
+        Mockito.when(productRepo.getProducts()).thenReturn(emptyProductList);
 
-        assertTrue(result);
-    }
+        boolean isAvailable = shopService.checkAvailabiltiy(product);
 
-    @Test
-    public void testCheckAvailabilityProductNotAvailable() {
-        Product nonExistingProduct = new Product(20.0, "Product C", "C001", 1);
-        boolean result = shopService.checkAvailabiltiy(nonExistingProduct);
-
-        assertFalse(result);
+        assertThat(isAvailable).isFalse();
     }
 }

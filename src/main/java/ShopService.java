@@ -5,29 +5,25 @@ public class ShopService {
     private ProductRepo productRepo;
     private OrderRepo orderRepo;
 
-    public ShopService(OrderListRepo listRepo, ProductRepo productRepo) {
+    public ShopService(OrderRepo orderRepo, ProductRepo productRepo) {
         this.productRepo = productRepo;
-        this.orderRepo = listRepo;
+        this.orderRepo = orderRepo;
     }
 
-    public ShopService(OrderMapRepo mapRepo, ProductRepo productRepo) {
-        this.productRepo = productRepo;
-        this.orderRepo = mapRepo;
-    }
-
-    public Order createOrder(String orderNumber, Product product){
+    public void createOrder(String orderNumber, Product product, int quantity){
 
         if(checkAvailabiltiy(product)){
-            Order newOrder = new Order(orderNumber, product);
+
+            double totalPrice = quantity * product.price();
+            Order newOrder = new Order(orderNumber, product, quantity , totalPrice);
             if(checkDuplicateOrder(newOrder)) {
 
                 orderRepo.addOrder(newOrder);
-                return newOrder;
+                return;
             }
         }
 
         System.out.println("Order was not created.");
-        return null;
     }
 
     public boolean checkDuplicateOrder(Order order){

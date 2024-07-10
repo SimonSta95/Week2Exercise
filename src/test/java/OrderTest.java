@@ -1,70 +1,66 @@
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 public class OrderTest {
 
     @Test
-    public void testOrderCreation() {
-        // Create a product for the order
-        Product product = new Product(100.0, "Product1", "P001", 10);
+    public void testCreateOrder() {
+        String orderNumber = "ORD123";
+        Product product = new Product(19.99, "Test Product", "12345");
+        int quantity = 2;
+        double totalPrice = 39.98;
 
-        // Create an order
-        String orderNumber = "123";
-        Order order = new Order(String.valueOf(orderNumber), product);
+        Order order = new Order(orderNumber, product, quantity, totalPrice);
 
-        // Verify orderNumber and product are correctly set
         assertEquals(orderNumber, order.orderNumber());
         assertEquals(product, order.product());
+        assertEquals(quantity, order.quantity());
+        assertEquals(totalPrice, order.totalPrice());
     }
 
     @Test
-    public void testOrderEquality() {
-        // Create products for orders
-        Product product1 = new Product(100.0, "Product1", "P001", 10);
-        Product product2 = new Product(150.0, "Product2", "P002", 5);
+    public void testWithQuantity() {
+        String orderNumber = "ORD123";
+        Product product = new Product(19.99, "Test Product", "12345");
+        int initialQuantity = 2;
+        double initialTotalPrice = 39.98;
 
-        // Create orders with different order numbers but the same product
-        int orderNumber1 = 123;
-        int orderNumber2 = 456;
+        Order order = new Order(orderNumber, product, initialQuantity, initialTotalPrice);
 
-        Order order1 = new Order(String.valueOf(orderNumber1), product1);
-        Order order2 = new Order(String.valueOf(orderNumber1), product1);
-        Order order3 = new Order(String.valueOf(orderNumber2), product1);
+        int newQuantity = 3;
+        double newTotalPrice = product.price() * newQuantity;
 
-        // Verify equality
-        assertEquals(order1, order2, "Orders with the same order number and product should be equal");
-        assertNotEquals(order1, order3, "Orders with different order numbers should not be equal");
+        Order updatedOrder = order.withQuantity(newQuantity);
+
+        assertEquals(orderNumber, updatedOrder.orderNumber());
+        assertEquals(product, updatedOrder.product());
+        assertEquals(newQuantity, updatedOrder.quantity());
+        assertEquals(newTotalPrice, updatedOrder.totalPrice());
     }
 
     @Test
-    public void testOrderHashCode() {
-        // Create products for orders
-        Product product1 = new Product(100.0, "Product1", "P001", 10);
-        Product product2 = new Product(150.0, "Product2", "P002", 5);
+    public void testWithQuantityCreatesNewInstance() {
+        String orderNumber = "ORD123";
+        Product product = new Product(19.99, "Test Product", "12345");
+        int initialQuantity = 2;
+        double initialTotalPrice = 39.98;
 
-        // Create orders with the same order number and product
-        int orderNumber = 123;
+        Order order = new Order(orderNumber, product, initialQuantity, initialTotalPrice);
 
-        Order order1 = new Order(String.valueOf(orderNumber), product1);
-        Order order2 = new Order(String.valueOf(orderNumber), product1);
-        Order order3 = new Order(String.valueOf(orderNumber), product2);
+        Order updatedOrder = order.withQuantity(3);
 
-        // Verify hashCode
-        assertEquals(order1.hashCode(), order2.hashCode(), "Orders with the same order number and product should have the same hash code");
-        assertNotEquals(order1.hashCode(), order3.hashCode(), "Orders with different products should have different hash codes");
+        // Verify that a new instance is created
+        assertNotSame(order, updatedOrder);
     }
 
     @Test
-    public void testOrderToString() {
-        // Create a product for the order
-        Product product = new Product(100.0, "Product1", "P001", 10);
+    public void testTotalPriceCalculation() {
+        Product product = new Product(19.99, "Test Product", "12345");
+        int quantity = 4;
+        double expectedTotalPrice = product.price() * quantity;
 
-        // Create an order
-        int orderNumber = 123;
-        Order order = new Order(String.valueOf(orderNumber), product);
+        Order order = new Order("ORD123", product, quantity, expectedTotalPrice);
 
-        // Verify toString representation
-        assertEquals("Order[orderNumber=123, product=Product[price=100.0, name=Product1, productNumber=P001, quantity=10]]", order.toString(), "toString method should return the correct representation");
+        assertEquals(expectedTotalPrice, order.totalPrice());
     }
 }

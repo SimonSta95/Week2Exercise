@@ -1,11 +1,10 @@
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class ProductRepoTest {
 
-class ProductRepoTest {
     private ProductRepo productRepo;
 
     @BeforeEach
@@ -15,53 +14,60 @@ class ProductRepoTest {
 
     @Test
     public void testAddProduct() {
-        Product product = new Product(100.0, "Product1", "P001", 10);
+        Product product = new Product(19.99, "Test Product", "12345");
         productRepo.addProduct(product);
+
         List<Product> products = productRepo.getProducts();
-        assertEquals(1, products.size());
-        assertTrue(products.contains(product));
+        assertThat(products).contains(product);
     }
 
     @Test
     public void testRemoveProduct() {
-        Product product = new Product(100.0, "Product1", "P001", 10);
+        Product product = new Product(19.99, "Test Product", "12345");
         productRepo.addProduct(product);
         productRepo.removeProduct(product);
+
         List<Product> products = productRepo.getProducts();
-        assertFalse(products.contains(product));
+        assertThat(products).doesNotContain(product);
     }
 
     @Test
     public void testGetProductByName() {
-        Product product1 = new Product(100.0, "Product1", "P001", 10);
-        Product product2 = new Product(150.0, "Product2", "P002", 5);
+        Product product1 = new Product(19.99, "Test Product 1", "12345");
+        Product product2 = new Product(29.99, "Test Product 2", "67890");
         productRepo.addProduct(product1);
         productRepo.addProduct(product2);
-        Product foundProduct = productRepo.getProductByName("Product1");
-        assertEquals(product1, foundProduct);
-        assertNull(productRepo.getProductByName("NonExistentProduct"));
+
+        Product foundProduct = productRepo.getProductByName("Test Product 1");
+        assertThat(foundProduct).isEqualTo(product1);
+
+        Product notFoundProduct = productRepo.getProductByName("Non-existent Product");
+        assertThat(notFoundProduct).isNull();
     }
 
     @Test
     public void testGetProductByNumber() {
-        Product product1 = new Product(100.0, "Product1", "P001", 10);
-        Product product2 = new Product(150.0, "Product2", "P002", 5);
+        Product product1 = new Product(19.99, "Test Product 1", "12345");
+        Product product2 = new Product(29.99, "Test Product 2", "67890");
         productRepo.addProduct(product1);
         productRepo.addProduct(product2);
-        Product foundProduct = productRepo.getProductByNumber("P001");
-        assertEquals(product1, foundProduct);
-        assertNull(productRepo.getProductByNumber("P999"));
+
+        Product foundProduct = productRepo.getProductByNumber("12345");
+        assertThat(foundProduct).isEqualTo(product1);
+
+        Product notFoundProduct = productRepo.getProductByNumber("00000");
+        assertThat(notFoundProduct).isNull();
     }
 
     @Test
     public void testGetProducts() {
-        Product product1 = new Product(100.0, "Product1", "P001", 10);
-        Product product2 = new Product(150.0, "Product2", "P002", 5);
+        Product product1 = new Product(19.99, "Test Product 1", "12345");
+        Product product2 = new Product(29.99, "Test Product 2", "67890");
         productRepo.addProduct(product1);
         productRepo.addProduct(product2);
+
         List<Product> products = productRepo.getProducts();
-        assertEquals(2, products.size());
-        assertTrue(products.contains(product1));
-        assertTrue(products.contains(product2));
+        assertThat(products).containsExactlyInAnyOrder(product1, product2);
+        assertThat(products).hasSize(2);
     }
 }

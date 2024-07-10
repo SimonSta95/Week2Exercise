@@ -1,36 +1,47 @@
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class ProductTest {
 
-class ProductTest {
     @Test
-    public void testProductCreation() {
-        Product product = new Product(10.0, "Product1", "123", 5);
+    public void testCreateProduct() {
+        double price = 19.99;
+        String name = "Test Product";
+        String productNumber = "12345";
 
-        assertNotNull(product);
-        assertEquals(10.0, product.price());
-        assertEquals("Product1", product.name());
-        assertEquals("123", product.productNumber());
-        assertEquals(5, product.quantity());
+        Product product = new Product(price, name, productNumber);
+
+        assertEquals(price, product.price());
+        assertEquals(name, product.name());
+        assertEquals(productNumber, product.productNumber());
     }
 
     @Test
-    public void testEqualsAndHashCode() {
-        Product product1 = new Product(10.0, "Product1", "123", 5);
-        Product product2 = new Product(10.0, "Product1", "123", 5);
-        Product product3 = new Product(15.0, "Product2", "456", 2);
+    public void testWithPrice() {
+        double initialPrice = 19.99;
+        double newPrice = 29.99;
+        String name = "Test Product";
+        String productNumber = "12345";
 
-        assertEquals(product1, product2);
-        assertEquals(product1.hashCode(), product2.hashCode());
-        assertNotEquals(product1, product3);
-        assertNotEquals(product1.hashCode(), product3.hashCode());
+        Product product = new Product(initialPrice, name, productNumber);
+        Product updatedProduct = product.withPrice(newPrice);
+
+        assertEquals(newPrice, updatedProduct.price());
+        assertEquals(name, updatedProduct.name());
+        assertEquals(productNumber, updatedProduct.productNumber());
     }
 
     @Test
-    public void testToString() {
-        Product product = new Product(10.0, "Product1", "123", 5);
-        String expectedString = "Product[price=10.0, name=Product1, productNumber=123, quantity=5]";
+    public void testWithPriceCreatesNewInstance() {
+        double initialPrice = 19.99;
+        double newPrice = 29.99;
+        String name = "Test Product";
+        String productNumber = "12345";
 
-        assertEquals(expectedString, product.toString());
+        Product product = new Product(initialPrice, name, productNumber);
+        Product updatedProduct = product.withPrice(newPrice);
+
+        // Verify that a new instance is created
+        assertNotSame(product, updatedProduct);
     }
 }

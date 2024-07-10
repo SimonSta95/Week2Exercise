@@ -1,57 +1,61 @@
+import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 public class OrderListRepoTest {
+
     private OrderListRepo orderListRepo;
+    private Product product;
 
     @BeforeEach
     public void setUp() {
         orderListRepo = new OrderListRepo();
+        product = new Product(19.99, "Test Product", "12345");
     }
 
     @Test
     public void testAddOrder() {
-        Order order = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
+        Order order = new Order("ORD123", product, 2, 39.98);
         orderListRepo.addOrder(order);
+
         List<Order> orders = orderListRepo.getAllOrders();
-        assertEquals(1, orders.size());
-        assertTrue(orders.contains(order));
+        assertThat(orders).contains(order);
     }
 
     @Test
     public void testRemoveOrder() {
-        Order order = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
+        Order order = new Order("ORD123", product, 2, 39.98);
         orderListRepo.addOrder(order);
         orderListRepo.removeOrder(order);
+
         List<Order> orders = orderListRepo.getAllOrders();
-        assertFalse(orders.contains(order));
-        assertTrue(orders.isEmpty());
+        assertThat(orders).doesNotContain(order);
+    }
+
+    @Test
+    public void testGetOrderByNumber() {
+        Order order1 = new Order("ORD123", product, 2, 39.98);
+        Order order2 = new Order("ORD456", product, 3, 59.97);
+        orderListRepo.addOrder(order1);
+        orderListRepo.addOrder(order2);
+
+        Order foundOrder = orderListRepo.getOrderByNumber("ORD123");
+        assertThat(foundOrder).isEqualTo(order1);
+
+        Order notFoundOrder = orderListRepo.getOrderByNumber("ORD999");
+        assertThat(notFoundOrder).isNull();
     }
 
     @Test
     public void testGetAllOrders() {
-        Order order1 = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
-        Order order2 = new Order(String.valueOf(2), new Product(150.0, "Product2", "P002", 5));
+        Order order1 = new Order("ORD123", product, 2, 39.98);
+        Order order2 = new Order("ORD456", product, 3, 59.97);
         orderListRepo.addOrder(order1);
         orderListRepo.addOrder(order2);
-        List<Order> orders = orderListRepo.getAllOrders();
-        assertEquals(2, orders.size());
-        assertTrue(orders.contains(order1));
-        assertTrue(orders.contains(order2));
-    }
 
-    @Test
-    public void testGetOrderById() {
-        Order order1 = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
-        Order order2 = new Order(String.valueOf(2), new Product(150.0, "Product2", "P002", 5));
-        orderListRepo.addOrder(order1);
-        orderListRepo.addOrder(order2);
-        Order foundOrder = orderListRepo.getOrderById(1);
-        assertEquals(order1, foundOrder);
-        assertNull(orderListRepo.getOrderById(999), "Non-existent order ID should return null");
+        List<Order> orders = orderListRepo.getAllOrders();
+        assertThat(orders).containsExactlyInAnyOrder(order1, order2);
+        assertThat(orders).hasSize(2);
     }
 }

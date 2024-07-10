@@ -1,73 +1,62 @@
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 public class OrderMapRepoTest {
-    private OrderMapRepo orderMapRepo;
 
-    @Mock
-    private Map<String, Order> mockOrderRepo;
+    private OrderMapRepo orderMapRepo;
+    private Product product;
 
     @BeforeEach
     public void setUp() {
-        MockitoAnnotations.openMocks(this);
         orderMapRepo = new OrderMapRepo();
-        orderMapRepo.orderRepo = mockOrderRepo;
-    }
-
-    @Test
-    public void testGetAllOrders() {
-        List<Order> expectedOrders = List.of(
-                new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10)),
-                new Order(String.valueOf(2), new Product(150.0, "Product2", "P002", 5))
-        );
-
-        when(mockOrderRepo.values()).thenReturn(new ArrayList<>(expectedOrders));
-
-        List<Order> actualOrders = orderMapRepo.getAllOrders();
-
-        assertEquals(expectedOrders.size(), actualOrders.size());
-        assertTrue(actualOrders.containsAll(expectedOrders));
-    }
-
-    @Test
-    public void testGetOrderById() {
-        Order expectedOrder = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
-        String orderId = String.valueOf(expectedOrder.orderNumber());
-
-        when(mockOrderRepo.get(orderId)).thenReturn(expectedOrder);
-
-        Order actualOrder = orderMapRepo.getOrderById(Integer.parseInt(expectedOrder.orderNumber()));
-
-        assertEquals(expectedOrder, actualOrder);
+        product = new Product(19.99, "Test Product", "12345");
     }
 
     @Test
     public void testAddOrder() {
-        Order orderToAdd = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
+        Order order = new Order("ORD123", product, 2, 39.98);
+        orderMapRepo.addOrder(order);
 
-        orderMapRepo.addOrder(orderToAdd);
-
-        verify(mockOrderRepo, times(1)).put(String.valueOf(orderToAdd.orderNumber()), orderToAdd);
+        Order retrievedOrder = orderMapRepo.getOrderByNumber("ORD123");
+        assertEquals(order, retrievedOrder);
     }
 
     @Test
     public void testRemoveOrder() {
-        Order orderToRemove = new Order(String.valueOf(1), new Product(100.0, "Product1", "P001", 10));
+        Order order = new Order("ORD123", product, 2, 39.98);
+        orderMapRepo.addOrder(order);
+        orderMapRepo.removeOrder(order);
 
-        when(mockOrderRepo.remove(String.valueOf(orderToRemove.orderNumber()))).thenReturn(orderToRemove);
+        Order retrievedOrder = orderMapRepo.getOrderByNumber("ORD123");
+        assertNull(retrievedOrder);
+    }
 
-        orderMapRepo.removeOrder(orderToRemove);
+    @Test
+    public void testGetOrderByNumber() {
+        Order order1 = new Order("ORD123", product, 2, 39.98);
+        Order order2 = new Order("ORD456", product, 3, 59.97);
+        orderMapRepo.addOrder(order1);
+        orderMapRepo.addOrder(order2);
 
-        verify(mockOrderRepo, times(1)).remove(String.valueOf(orderToRemove.orderNumber()));
+        Order foundOrder = orderMapRepo.getOrderByNumber("ORD123");
+        assertEquals(order1, foundOrder);
+
+        Order notFoundOrder = orderMapRepo.getOrderByNumber("ORD999");
+        assertNull(notFoundOrder);
+    }
+
+    @Test
+    public void testGetAllOrders() {
+        Order order1 = new Order("ORD123", product, 2, 39.98);
+        Order order2 = new Order("ORD456", product, 3, 59.97);
+        orderMapRepo.addOrder(order1);
+        orderMapRepo.addOrder(order2);
+
+        List<Order> orders = orderMapRepo.getAllOrders();
+        assertTrue(orders.contains(order1));
+        assertTrue(orders.contains(order2));
+        assertEquals(2, orders.size());
     }
 }

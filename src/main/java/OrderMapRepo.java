@@ -13,8 +13,8 @@ public class OrderMapRepo implements OrderRepo{
         return new ArrayList<>(orderRepo.values());
     }
 
-    public Order getOrderById(int id){
-        return orderRepo.get(String.valueOf(id));
+    public Order getOrderByNumber(String number){
+        return orderRepo.get(number);
     }
 
     public void addOrder(Order order){
