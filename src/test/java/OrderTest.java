@@ -10,7 +10,7 @@ public class OrderTest {
         Product product = new Product(100.0, "Product1", "P001", 10);
 
         // Create an order
-        int orderNumber = 123;
+        String orderNumber = "123";
         Order order = new Order(String.valueOf(orderNumber), product);
 
         // Verify orderNumber and product are correctly set

@@ -55,6 +55,9 @@ public class ShopServiceTest {
 
     @Test
     public void testCheckDuplicateOrderExistingOrder() {
+
+        orderRepo.addOrder(new Order("ORD001", new Product(10.0, "Product A", "A001", 5)));
+
         Order existingOrder = new Order("ORD001", new Product(10.0, "Product A", "A001", 5));
         boolean result = shopService.checkDuplicateOrder(existingOrder);
 
